@@ -1,0 +1,4 @@
+dependencies:
+- https://github.com/korlibs/korge-ldtk/tree/v1.0.2/korge-ldtk##3cc31bddd707037084f8e0d764a9706cc99f0bfb
+- https://github.com/korlibs/korge-mascots/tree/v1.0.0/korge-mascots##dd8f5d14fa7b637dfdcfd2fc76d3cbf612f7b72e
+- https://github.com/korlibs/korge-virtualcontroller/tree/v1.0.2/korge-virtualcontroller##df0e840b8171bb3f5b8f7a86b77fbe39e725be16
