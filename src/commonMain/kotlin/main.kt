@@ -49,7 +49,7 @@ class MyScene : Scene() {
     var initZoom = 32.0
 
     @KeepOnReload
-    var zoom = 256.0
+    var zoom = 128.0
 
     @ViewProperty
     var gravity = Vector2D(0, 10)
@@ -102,7 +102,7 @@ class MyScene : Scene() {
         val virtualController = virtualController(
             buttons = listOf(
                 VirtualButtonConfig.SOUTH,
-                VirtualButtonConfig(Key.Z, GameButton.START, Anchor.BOTTOM_RIGHT, offset = Point(0, -buttonRadius * 1.5f))
+                //VirtualButtonConfig(Key.Z, GameButton.START, Anchor.BOTTOM_RIGHT, offset = Point(0, -buttonRadius * 1.5f))
             ),
             buttonRadius = buttonRadius
         ).also { it.container.alpha(0.5f) }
@@ -189,11 +189,11 @@ class MyScene : Scene() {
 
         var currentRect = Rectangle.getRectWithAnchorClamped(player.pos, createSize(initZoom), Anchor.CENTER, mapBounds)
 
-        virtualController.down(GameButton.START) {
+        /*virtualController.down(GameButton.START) {
             val zoomC = zoom
             val zoomC2 = if (zoomC >= 1024.0) 128.0 else zoomC * 2
             zoom = zoomC2
-        }
+        }*/
 
         val FREQ = 60.hz
         addFixedUpdater(FREQ) {
