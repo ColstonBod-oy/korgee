@@ -6,6 +6,7 @@ plugins {
 
 korge {
 	id = "com.sample.demo"
+    orientation = Orientation.LANDSCAPE
 
 // To enable all targets at once
 
