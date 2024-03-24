@@ -1,6 +1,8 @@
 import com.dragonbones.core.*
 import korlibs.event.*
+import korlibs.image.atlas.*
 import korlibs.image.color.*
+import korlibs.image.format.*
 import korlibs.io.file.std.*
 import korlibs.korge.*
 import korlibs.korge.dragonbones.*
@@ -8,6 +10,7 @@ import korlibs.korge.input.*
 import korlibs.korge.mascots.*
 import korlibs.korge.scene.*
 import korlibs.korge.view.*
+import korlibs.korge.view.animation.*
 import korlibs.korge.view.property.*
 import korlibs.korge.virtualcontroller.*
 import korlibs.math.*
@@ -54,7 +57,8 @@ class MyScene : Scene() {
     @ViewProperty
     var gravity = Vector2D(0, 10)
 
-    lateinit var player: KorgeDbArmatureDisplay
+    lateinit var characters: ImageDataContainer
+    lateinit var player: ImageDataView
 
     @ViewProperty
     fun teleportInitialPos() {
@@ -68,18 +72,25 @@ class MyScene : Scene() {
             size = Size(views.actualVirtualWidth, views.actualVirtualHeight)
             immediateSetCamera = true
         }
+        val atlas = MutableAtlasUnit()
         val world = resourcesVfs["ldtk/Typical_2D_platformer_example.ldtk"].readLDTKWorldExt()
         val collisions = world.createCollisionMaps()
         //val mapView = LDTKViewExt(world, showCollisions = true)
         val mapView = LDTKViewExt(world, showCollisions = false)
         //println(collisions)
-        val db = KorgeDbFactory()
+        /*val db = KorgeDbFactory()
         db.loadKorgeMascots()
 
         player = db.buildArmatureDisplayGest()!!
             .xy(currentPlayerPos)
             .play(KorgeMascotsAnimations.IDLE)
-            .scale(0.080)
+            .scale(0.080)*/
+
+        characters = resourcesVfs["chumbo.ase"].readImageDataContainer(ASE.toProps(), atlas = atlas)
+        player = imageDataView(characters["chumbo"], "idle", playing = true, smoothing = false) {
+            xy(currentPlayerPos)
+            scale(0.080)
+        }
 
         val camera = camera {
             this += mapView
@@ -135,7 +146,7 @@ class MyScene : Scene() {
         fun setState(name: String, time: TimeSpan) {
             if (playerState != name) {
                 playerState = name
-                player.animation.fadeIn(playerState, time)
+                //player.animation.fadeIn(playerState, time)
             }
         }
 
