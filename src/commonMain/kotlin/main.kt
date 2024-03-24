@@ -126,11 +126,11 @@ class MyScene : Scene() {
             val collisionPoints = listOf(
                 newPos,
                 newPos + Point(-12, 0),
-                newPos + Point(+28, 0),
+                newPos + Point(+12, 0),
                 newPos + Point(-12, +14),
-                newPos + Point(+28, +14),
+                newPos + Point(+12, +14),
                 newPos + Point(-12, +28.5),
-                newPos + Point(+28, +28.5),
+                newPos + Point(+12, +28.5),
             )
 
             var set = collisionPoints.all { !COLLISIONS.isSolid(collisions.getPixel(it), delta) }
@@ -162,6 +162,7 @@ class MyScene : Scene() {
 
         fun updated(right: Boolean, up: Boolean, scale: Float = 1f) {
             if (!up) {
+                player.anchor(0.5f, 0f)
                 player.scaleX = player.scaleX.absoluteValue * if (right) +1f else -1f
                 tryMoveDelta(Point(2.0, 0) * (if (right) +1 else -1) * scale)
                 player.speed = 2.0 * scale
