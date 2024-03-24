@@ -89,6 +89,7 @@ class MyScene : Scene() {
 
         characters = resourcesVfs["chumbo.ase"].readImageDataContainer(ASE.toProps(), atlas = atlas)
         player = imageDataView(characters["chumbo"], "idle", playing = true, smoothing = false) {
+            anchor(0.5f, 0f)
             xy(currentPlayerPos)
         }
 
@@ -150,11 +151,9 @@ class MyScene : Scene() {
                 animator {
                     tween(time = time, easing = Easing.EASE_IN)
                     block {
-                        player.animation = name
+                        player.animation = playerState
                     }
                 }
-
-                player.play()
             }
         }
 
@@ -171,7 +170,6 @@ class MyScene : Scene() {
 
         fun updated(right: Boolean, up: Boolean, scale: Float = 1f) {
             if (!up) {
-                player.anchor(0.5f, 0f)
                 player.scaleX = player.scaleX.absoluteValue * if (right) +1f else -1f
                 tryMoveDelta(Point(2.0, 0) * (if (right) +1 else -1) * scale)
                 player.speed = 2.0 * scale
@@ -187,8 +185,7 @@ class MyScene : Scene() {
         virtualController.apply {
             down(GameButton.BUTTON_SOUTH) {
                 val isInGround = playerSpeed.y.isAlmostZero()
-                //if (isInGround) {
-                if (true) {
+                if (isInGround) {
                     if (!jumping) {
                         jumping = true
                         updateState()
