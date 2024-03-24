@@ -5,6 +5,7 @@ import korlibs.image.color.*
 import korlibs.image.format.*
 import korlibs.io.file.std.*
 import korlibs.korge.*
+import korlibs.korge.animate.*
 import korlibs.korge.dragonbones.*
 import korlibs.korge.input.*
 import korlibs.korge.mascots.*
@@ -145,7 +146,14 @@ class MyScene : Scene() {
         fun setState(name: String, time: TimeSpan) {
             if (playerState != name) {
                 playerState = name
-                player.animation = name
+
+                animator {
+                    tween(time = time, easing = Easing.EASE_IN)
+                    block {
+                        player.animation = name
+                    }
+                }
+
                 player.play()
             }
         }
