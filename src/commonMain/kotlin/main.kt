@@ -145,7 +145,8 @@ class MyScene : Scene() {
         fun setState(name: String, time: TimeSpan) {
             if (playerState != name) {
                 playerState = name
-                //player.animation.fadeIn(playerState, time)
+                player.animation = name
+                player.play()
             }
         }
 
@@ -154,8 +155,8 @@ class MyScene : Scene() {
 
         fun updateState() {
             when {
-                jumping -> setState("jump", 0.1.seconds)
-                moving -> setState("walk", 0.1.seconds)
+                //jumping -> setState("jump", 0.1.seconds)
+                moving -> setState("walking", 0.1.seconds)
                 else -> setState("idle", 0.3.seconds)
             }
         }
