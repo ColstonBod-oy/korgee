@@ -89,7 +89,6 @@ class MyScene : Scene() {
         characters = resourcesVfs["chumbo.ase"].readImageDataContainer(ASE.toProps(), atlas = atlas)
         player = imageDataView(characters["chumbo"], "idle", playing = true, smoothing = false) {
             xy(currentPlayerPos)
-            scale(0.080)
         }
 
         val camera = camera {
