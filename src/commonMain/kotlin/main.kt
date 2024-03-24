@@ -46,7 +46,7 @@ object COLLISIONS {
 
 class MyScene : Scene() {
     @KeepOnReload
-    var currentPlayerPos = Point(200, 200)
+    var currentPlayerPos = Point(200, 150)
 
     @KeepOnReload
     var initZoom = 32.0
@@ -62,7 +62,7 @@ class MyScene : Scene() {
 
     @ViewProperty
     fun teleportInitialPos() {
-        currentPlayerPos = Point(200, 200)
+        currentPlayerPos = Point(200, 150)
         player.pos = currentPlayerPos
     }
 
@@ -125,12 +125,12 @@ class MyScene : Scene() {
 
             val collisionPoints = listOf(
                 newPos,
-                newPos + Point(-5, 0),
-                newPos + Point(+5, 0),
-                newPos + Point(-5, -7),
-                newPos + Point(+5, -7),
-                newPos + Point(-5, -14),
-                newPos + Point(+5, -14),
+                newPos + Point(-12, 0),
+                newPos + Point(+28, 0),
+                newPos + Point(-12, +14),
+                newPos + Point(+28, +14),
+                newPos + Point(-12, +28.5),
+                newPos + Point(+28, +28.5),
             )
 
             var set = collisionPoints.all { !COLLISIONS.isSolid(collisions.getPixel(it), delta) }
