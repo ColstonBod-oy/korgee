@@ -124,9 +124,17 @@ class MyScene : Scene() {
             val newPos = player.pos + delta
 
             val collisionPoints = listOf(
-                newPos,
-                newPos + Point(-12, 0),
-                newPos + Point(+12, 0),
+                // This causes the collision point to be equal
+                // to the player's new position, which is always
+                // at the top of the sprite when jumping
+                //newPos,
+
+                // This does the exact same thing as above
+                // because "y = 0" is the top of the sprite
+                // and moves down with a positive value
+                //newPos + Point(-12, 0),
+                //newPos + Point(+12, 0),
+
                 newPos + Point(-12, +14),
                 newPos + Point(+12, +14),
                 newPos + Point(-12, +28.5),
