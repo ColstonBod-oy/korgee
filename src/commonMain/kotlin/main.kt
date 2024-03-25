@@ -168,7 +168,7 @@ class MyScene : Scene() {
 
         fun updateState() {
             when {
-                //jumping -> setState("jump", 0.1.seconds)
+                jumping -> setState("jumping", 0.1.seconds)
                 moving -> setState("walking", 0.1.seconds)
                 else -> setState("idle", 0.3.seconds)
             }
