@@ -100,10 +100,8 @@ class MyScene : Scene() {
 
         text(
             """
-                Use the arrow keys '<-' '->' to move Gest
-                'z' for zoom
+                Use the arrow keys '<-' '->' to move Chumbo
                 Space for jumping
-                startPos = $currentPlayerPos
             """.trimIndent()
         ).xy(8, 8)
 
