@@ -5,7 +5,8 @@ plugins {
 }
 
 korge {
-	id = "com.sample.demo"
+	id = "com.cattleya.korgee"
+    name = "Korgee"
     orientation = Orientation.LANDSCAPE
 
 // To enable all targets at once
