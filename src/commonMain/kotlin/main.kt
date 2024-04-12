@@ -1,4 +1,3 @@
-import com.dragonbones.core.*
 import korlibs.event.*
 import korlibs.image.atlas.*
 import korlibs.image.color.*
@@ -6,9 +5,6 @@ import korlibs.image.format.*
 import korlibs.io.file.std.*
 import korlibs.korge.*
 import korlibs.korge.animate.*
-import korlibs.korge.dragonbones.*
-import korlibs.korge.input.*
-import korlibs.korge.mascots.*
 import korlibs.korge.scene.*
 import korlibs.korge.view.*
 import korlibs.korge.view.animation.*
@@ -34,14 +30,18 @@ suspend fun main() = Korge(
 }
 
 object COLLISIONS {
-    val OUTSIDE = -1
-    val EMPTY = 0
-    val DIRT = 1
-    val LADDER = 2
-    val STONE = 3
+    private const val OUTSIDE = -1
+    private const val EMPTY = 0
+    private const val DIRT = 1
+    private const val LADDER = 2
+    private const val STONE = 3
 
     fun isSolid(type: Int, direction: Vector2D): Boolean {
         return type == DIRT || type == STONE || type == OUTSIDE
+    }
+
+    fun isLadder(type: Int, direction: Vector2D): Boolean {
+        return type == LADDER
     }
 }
 
@@ -58,7 +58,7 @@ class MyScene : Scene() {
     @ViewProperty
     var gravity = Vector2D(0, 10)
 
-    lateinit var characters: ImageDataContainer
+    private lateinit var characters: ImageDataContainer
     lateinit var player: ImageDataView
 
     @ViewProperty
@@ -120,7 +120,7 @@ class MyScene : Scene() {
         var playerSpeed = Vector2D(0, 0)
         val mapBounds = mapView.getLocalBounds()
 
-        fun tryMoveDelta(delta: Point): Boolean {
+        fun tryMoveDeltaX(delta: Point): Boolean {
             val newPos = player.pos + delta
 
             val collisionPoints = listOf(
@@ -141,10 +141,29 @@ class MyScene : Scene() {
                 newPos + Point(+12, +28.5),
             )
 
-            var set = collisionPoints.all { !COLLISIONS.isSolid(collisions.getPixel(it), delta) }
+            val set = collisionPoints.all { !COLLISIONS.isSolid(collisions.getPixel(it), delta) }
             if (set) {
                 player.pos = newPos
                 currentPlayerPos = newPos
+            }
+            return set
+        }
+
+        var climbing = false
+
+        fun tryMoveDeltaY(delta: Point): Boolean {
+            val newPos = player.pos + delta
+
+            val collisionPoints = listOf(
+                newPos + Point(-6, +29),
+                newPos + Point(+6, +29),
+            )
+
+            val set = collisionPoints.all { COLLISIONS.isLadder(collisions.getPixel(it), delta) }
+            if (set) {
+                player.pos = newPos
+                currentPlayerPos = newPos
+                climbing = true
             }
             return set
         }
@@ -164,25 +183,34 @@ class MyScene : Scene() {
         }
 
         var jumping = false
-        var moving = false
+        var walking = false
 
         fun updateState() {
             when {
                 jumping -> setState("jumping", 0.1.seconds)
-                moving -> setState("walking", 0.1.seconds)
+                climbing -> setState("climbing", 0.1.seconds)
+                walking -> setState("walking", 0.1.seconds)
                 else -> setState("idle", 0.3.seconds)
             }
         }
 
-        fun updated(right: Boolean, up: Boolean, scale: Float = 1f) {
-            if (!up) {
-                player.scaleX = player.scaleX.absoluteValue * if (right) +1f else -1f
-                tryMoveDelta(Point(2.0, 0) * (if (right) +1 else -1) * scale)
-                player.speed = 2.0 * scale
-                moving = true
+        fun updated(left: Boolean, right: Boolean, up: Boolean, down: Boolean, midAir: Boolean, scale: Float = 1f) {
+            if (!midAir) {
+                if (left || right) {
+                    player.scaleX = player.scaleX.absoluteValue * if (right) +1f else -1f
+                    tryMoveDeltaX(Point(2.0, 0) * (if (right) +1 else -1) * scale)
+                    player.speed = 2.0 * scale
+                    climbing = false
+                    walking = true
+                } else if (up || down) {
+                    tryMoveDeltaY(Point(0, 0.7) * (if (up) -1 else +1) * scale)
+                    player.speed = 0.7 * scale
+                    walking = false
+                }
             } else {
                 player.speed = 1.0
-                moving = false
+                climbing = false
+                walking = false
             }
             updateState()
             //updateTextContainerPos()
@@ -199,9 +227,18 @@ class MyScene : Scene() {
                     playerSpeed += Vector2D(0, -5.5)
                 }
             }
+
+            // Changes where the player is looking while in midair
             changed(GameButton.LX) {
                 if (it.new.normalizeAlmostZero(.075f) == 0f) {
-                    updated(right = it.new > 0f, up = true, scale = 1f)
+                    updated(
+                        left = it.new < 0f,
+                        right = it.new > 0f,
+                        up = false,
+                        down = false,
+                        midAir = true,
+                        scale = 1f
+                    )
                 }
             }
         }
@@ -223,20 +260,62 @@ class MyScene : Scene() {
             // Move character
             run {
                 val lx = virtualController.lx.normalizeAlmostZero(.075f)
+                val ly = virtualController.ly.normalizeAlmostZero(.075f)
                 when {
                     lx < 0f -> {
-                        updated(right = false, up = false, scale = lx.absoluteValue)
+                        updated(
+                            left = true,
+                            right = false,
+                            up = false,
+                            down = false,
+                            midAir = false,
+                            scale = lx.absoluteValue
+                        )
                     }
+
                     lx > 0f -> {
-                        updated(right = true, up = false, scale = lx.absoluteValue)
+                        updated(
+                            left = false,
+                            right = true,
+                            up = false,
+                            down = false,
+                            midAir = false,
+                            scale = lx.absoluteValue
+                        )
+                    }
+
+                    ly < 0f -> {
+                        updated(
+                            left = false,
+                            right = false,
+                            up = true,
+                            down = false,
+                            midAir = false,
+                            scale = ly.absoluteValue
+                        )
+                    }
+
+                    ly > 0f -> {
+                        updated(
+                            left = false,
+                            right = false,
+                            up = false,
+                            down = true,
+                            midAir = false,
+                            scale = ly.absoluteValue
+                        )
                     }
                 }
             }
 
             // Apply gravity
             run {
-                playerSpeed += gravity * FREQ.timeSpan.seconds
-                if (!tryMoveDelta(playerSpeed)) {
+                // Only apply gravity if player is not climbing
+                if (!tryMoveDeltaY(playerSpeed)) {
+                    playerSpeed += gravity * FREQ.timeSpan.seconds
+                }
+
+                if (!tryMoveDeltaX(playerSpeed) && !tryMoveDeltaY(playerSpeed)) {
                     playerSpeed = Vector2D.ZERO
                     if (jumping) {
                         jumping = false
