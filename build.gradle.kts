@@ -20,9 +20,9 @@ korge {
 	
 	targetJvm()
 	targetJs()
-    targetWasm()
-	targetDesktop()
-	targetIos()
+    //targetWasm()
+	//targetDesktop()
+	//targetIos()
 	targetAndroid()
 
 	serializationJson()
